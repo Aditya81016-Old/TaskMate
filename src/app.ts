@@ -1,4 +1,5 @@
 // ! BOILERPLATE START {----------------------------------
+require('dotenv').config()
 import express, { json, urlencoded} from 'express';
 import mongoose, { ConnectOptions } from 'mongoose';
 import User, { UserInterface, UserDocument } from './models/user';
@@ -28,6 +29,7 @@ app.get('/', (req, res) => {
   res.send('LesGo')
 });
 
+// ! CRUD ON USER START {-------------------------------
 // * /user --route
 app.route('/user')
 .post((req, res) => {
@@ -73,16 +75,16 @@ app.route('/user/:id')
     const id: string = req.params.id
     const user: UserDocument | null = await User.findOne({_id: id});
     if (!user) {
-      return res.status(404).json({ log: 'User not found', status: false });
+      return res.json({ log: 'User not found', status: false });
     }
     
     user.set(req.body);
     await user.save();
 
-    return res.status(200).json({data: user, log: `User with id: ${id} found and updated`, status: true});
+    return res.json({data: user, log: `User with id: ${id} found and updated`, status: true});
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server Error', status: false });
+    return res.json({ message: 'Server Error', status: false });
   }
 })
 .delete(async (req, res) => {
@@ -93,20 +95,15 @@ app.route('/user/:id')
     if (result.deletedCount === 1) {
       return res.json({ log: `User with ID ${id} deleted successfully.`, status: true});
     } else {
-      return res.status(404).json({log: `User not found.`, status: false});
+      return res.json({log: `User not found.`, status: false});
     }
   } catch (err) {
-    return res.status(404).json({log: `There was an error`, status: false});
+    return res.json({log: `There was an error`, status: false});
   }
-
-  // User.deleteOne({ name: name, email: email, password: password, _id: id}, (err) => {
-  //   if (!err) {
-  //     return res.json({ log: `User with ID ${id} deleted successfully.`, status: true});
-  //   } else {
-  //     return res.status(404).json({log: `User not found.`, status: false});
-  //   }
-  // })
 })
+// ! -------------------------------} CRUD ON USER END
+
+
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
