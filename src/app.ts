@@ -59,7 +59,7 @@ app
           })
           .catch((error) => {
             res.json({
-              log: `Error saving new user: ${error.message}`,
+              log: `email already used`,
               status: false,
             });
           });
@@ -91,34 +91,58 @@ app
 // * /user/:id --route
 app
   .route("/user/:id")
+  .get(async (req, res) => {
+    const id = req.params.id;
+    let user: UserDocument | null = await User.findOne({ _id: id });
+
+    if (!user) {
+      res.json({ log: "User not found", status: false });
+    } else {
+      res.json({
+        data: user,
+        log: `User with id: ${user?._id} and email: ${user?.email} found!`,
+        status: true,
+      });
+    }
+  })
   .patch(async (req, res) => {
     try {
       const id: string = req.params.id;
+      const pass = req.query.password;
       const user: UserDocument | null = await User.findOne({ _id: id });
       if (!user) {
         return res.json({ log: "User not found", status: false });
       }
-      bcrypt.hash(
-        req.body.password,
-        saltRounds,
-        async (err, hashedPassword) => {
-          if (err) {
-            res.json({
-              log: `Error encrypting user password: ${err.message}`,
-              status: false,
-            });
-          } else if (hashedPassword) {
-            req.body.password = hashedPassword;
-            user.set(req.body);
-            await user.save();
-            return res.json({
-              data: user,
-              log: `User with id: ${id} found and updated`,
-              status: true,
-            });
-          }
+
+      bcrypt.compare(pass, user.password, async (err, result) => {
+        if (err) {
+          return res.json({ log: `Something Went Wrong`, status: false });
+        } else if (result) {
+          bcrypt.hash(
+            req.body.password,
+            saltRounds,
+            async (err, hashedPassword) => {
+              if (err) {
+                res.json({
+                  log: `Error encrypting user password: ${err.message}`,
+                  status: false,
+                });
+              } else if (hashedPassword) {
+                req.body.password = hashedPassword;
+                user.set(req.body);
+                await user.save();
+                return res.json({
+                  data: user,
+                  log: `User with id: ${id} found and updated`,
+                  status: true,
+                });
+              }
+            }
+          );
+        } else {
+          return res.json({ message: "Wrong Password", status: false });
         }
-      );
+      });
     } catch (error) {
       console.error(error);
       return res.json({ message: "Server Error", status: false });
@@ -136,33 +160,40 @@ app
       .then((response) => response.json())
       .then(async (data) => {
         console.log(data);
-        bcrypt.compare(req.body.password, data.data.password, async (err, result) => {
-          console.log(err, req.body.password, data.data.password)
-          if (err) {
-            return res.json({ log: `Something Went Wrong`, status: false })
-          } else if (result) {
-            try {
-              const result = await User.deleteOne({
-                name: req.body.name,
-                email: req.body.email,
-                _id: id,
-              });
-              if (result.deletedCount === 1) {
-                return res.json({
-                  log: `User with ID ${id} deleted successfully.`,
-                  status: true,
+        bcrypt.compare(
+          req.body.password,
+          data.data.password,
+          async (err, result) => {
+            console.log(err, req.body.password, data.data.password);
+            if (err) {
+              return res.json({ log: `Something Went Wrong`, status: false });
+            } else if (result) {
+              try {
+                const result = await User.deleteOne({
+                  name: req.body.name,
+                  email: req.body.email,
+                  _id: id,
                 });
-              } else {
-                return res.json({ log: `Please check your email or username`, status: false });
+                if (result.deletedCount === 1) {
+                  return res.json({
+                    log: `User with ID ${id} deleted successfully.`,
+                    status: true,
+                  });
+                } else {
+                  return res.json({
+                    log: `Please check your email or username`,
+                    status: false,
+                  });
+                }
+              } catch (err) {
+                console.log(err);
+                return res.json({ log: `There was an error`, status: false });
               }
-            } catch (err) {
-              console.log(err);
-              return res.json({ log: `There was an error`, status: false });
+            } else {
+              return res.json({ log: `Wrong Password`, status: false });
             }
-          } else {
-            return res.json({ log: `Wrong Password`, status: false });
           }
-        });
+        );
       })
       .catch((error) => {
         // handle error
