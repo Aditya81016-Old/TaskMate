@@ -68,7 +68,7 @@ app.route('/user')
 
 // * /user/:id --route
 app.route('/user/:id')
-.put(async (req, res) => {
+.patch(async (req, res) => {
   try {
     const id: string = req.params.id
     const user: UserDocument | null = await User.findOne({_id: id});
