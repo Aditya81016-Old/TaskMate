@@ -8,6 +8,7 @@ export interface Todo {
 
 export interface Category {
   name: string;
+  urlName: string;
   todos: Todo[];
 }
 
@@ -29,6 +30,7 @@ const todoSchema = new Schema<Todo>({
 
 const categorySchema = new Schema<Category>({
   name: {type: String, required: true, unique: true},
+  urlName: {type: String, required: true, unique: true},
   todos: {type: [todoSchema], required: true},
 })
 

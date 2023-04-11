@@ -2,12 +2,18 @@
 require("dotenv").config();
 import express, { json, urlencoded } from "express";
 import mongoose, { ConnectOptions } from "mongoose";
-import User, { UserInterface, UserDocument, Category, Todo } from "./models/user";
+import User, {
+  UserInterface,
+  UserDocument,
+  Category,
+  Todo,
+} from "./models/user";
 const bcrypt = require("bcrypt");
+const _ = require("lodash");
 
 const app = express();
 const PORT = 3000;
-const URL = `http://localhost:${PORT}`
+const URL = `http://localhost:${PORT}`;
 const saltRounds = 10;
 
 app.use(json());
@@ -39,14 +45,14 @@ app
       if (err) {
         res.json({
           log: `Error encrypting user password: ${err.message}`,
-          status: false,
+          success: false,
         });
       } else if (hashedPassword) {
         const newUser: UserInterface = {
           name: req.body.name,
           email: req.body.email,
           password: hashedPassword,
-          categories: req.body.categories
+          categories: req.body.categories,
         };
 
         const user = new User(newUser);
@@ -56,13 +62,13 @@ app
           .then((user) => {
             res.json({
               log: `New user ${user.name} has been added with id ${user._id}`,
-              status: true,
+              success: true,
             });
           })
           .catch((error) => {
             res.json({
               log: `email already used`,
-              status: false,
+              success: false,
             });
           });
       }
@@ -80,12 +86,12 @@ app
     }
 
     if (!user) {
-      res.json({ log: "User not found", status: false });
+      res.json({ log: "User not found", success: false });
     } else {
       res.json({
         data: user,
         log: `User with id: ${user?._id} and email: ${user?.email} found!`,
-        status: true,
+        success: true,
       });
     }
   });
@@ -98,12 +104,12 @@ app
     let user: UserDocument | null = await User.findOne({ _id: id });
 
     if (!user) {
-      res.json({ log: "User not found", status: false });
+      res.json({ log: "User not found", success: false });
     } else {
       res.json({
         data: user,
         log: `User with id: ${user?._id} and email: ${user?.email} found!`,
-        status: true,
+        success: true,
       });
     }
   })
@@ -113,12 +119,12 @@ app
       const pass = req.query.password;
       const user: UserDocument | null = await User.findOne({ _id: id });
       if (!user) {
-        return res.json({ log: "User not found", status: false });
+        return res.json({ log: "User not found", success: false });
       }
 
       bcrypt.compare(pass, user.password, async (err, result) => {
         if (err) {
-          return res.json({ log: `Something Went Wrong`, status: false });
+          return res.json({ log: `Something Went Wrong`, success: false });
         } else if (result) {
           bcrypt.hash(
             req.body.password,
@@ -127,7 +133,7 @@ app
               if (err) {
                 res.json({
                   log: `Error encrypting user password: ${err.message}`,
-                  status: false,
+                  success: false,
                 });
               } else if (hashedPassword) {
                 req.body.password = hashedPassword;
@@ -136,18 +142,18 @@ app
                 return res.json({
                   data: user,
                   log: `User with id: ${id} found and updated`,
-                  status: true,
+                  success: true,
                 });
               }
             }
           );
         } else {
-          return res.json({ message: "Wrong Password", status: false });
+          return res.json({ message: "Wrong Password", success: false });
         }
       });
     } catch (error) {
       console.error(error);
-      return res.json({ message: "Server Error", status: false });
+      return res.json({ message: "Server Error", success: false });
     }
   })
   .delete(async (req, res) => {
@@ -168,7 +174,7 @@ app
           async (err, result) => {
             console.log(err, req.body.password, data.data.password);
             if (err) {
-              return res.json({ log: `Something Went Wrong`, status: false });
+              return res.json({ log: `Something Went Wrong`, success: false });
             } else if (result) {
               try {
                 const result = await User.deleteOne({
@@ -179,20 +185,20 @@ app
                 if (result.deletedCount === 1) {
                   return res.json({
                     log: `User with ID ${id} deleted successfully.`,
-                    status: true,
+                    success: true,
                   });
                 } else {
                   return res.json({
                     log: `Please check your email or username`,
-                    status: false,
+                    success: false,
                   });
                 }
               } catch (err) {
                 console.log(err);
-                return res.json({ log: `There was an error`, status: false });
+                return res.json({ log: `There was an error`, success: false });
               }
             } else {
-              return res.json({ log: `Wrong Password`, status: false });
+              return res.json({ log: `Wrong Password`, success: false });
             }
           }
         );
@@ -205,32 +211,61 @@ app
 // ! -------------------------------} CRUD ON USER END
 
 // ! CRUD ON TODO LIST {------------------------------
-app.route('/:id')
-.post(async (req, res) => {
-  const id = req.params.id;
-  const categoryName = req.body.categoryName != undefined ? req.body.categoryName : null;
-  const newCategory: Category = {
-    name: categoryName,
-    todos: [
-      {
-        task: `Create a new task in ${categoryName}`,
-        state: 'Pending',
-      }
-    ]
-  }
-  try {
-    const user: UserDocument = await User.findByIdAndUpdate(
-      id,
-      { $addToSet: { categories: newCategory } },
-      { new: true }
-    );
-    res.status(200).json({ user });
-  } catch (error) {
-    res.status(500).json({ message: "Could not add favorite" });
-  }
-  
+app
+  .route("/user/:id/category")
+  .post(async (req, res) => {
+    const id = req.params.id;
+    const categoryName =
+      req.body.categoryName != undefined ? req.body.categoryName : null;
+    const newCategory: Category = {
+      name: categoryName,
+      urlName: _.kebabCase(categoryName),
+      todos: [
+        {
+          task: `Create a new task in ${categoryName}`,
+          state: "Pending",
+        },
+      ],
+    };
+    try {
+      const user: UserDocument = await User.findByIdAndUpdate(
+        id,
+        { $addToSet: { categories: newCategory } },
+        { new: true }
+      );
+      res.status(200).json({ user });
+    } catch (error) {
+      res.status(500).json({ message: "Could not add favorite" });
+    }
+  })
+  .get(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (!user)
+      res.json({ log: "Something went wrong: user not found", success: false });
+    else {
+      res.json({
+        log: "Successfully fetched all the user's categories",
+        data: user.categories,
+        success: true,
+      });
+    }
+  });
 
-})
+app.route("/user/:id/category/:category").get(async (req, res) => {
+  const user = await User.findOne({_id: req.params.id, "categories.urlName":  req.params.category});
+  if (!user)
+    res.json({ log: "Something went wrong: user not found", success: false });
+  else {
+    const category = user.categories.find(
+      (category) => category.urlName === req.params.category
+    );
+    res.json({
+      log: "Successfully fetched all the data of the category",
+      data: category,
+      success: true,
+    });
+  }
+});
 // ! --------------------------} CRUD ON TODO LIST END
 
 app.listen(PORT, () => {
