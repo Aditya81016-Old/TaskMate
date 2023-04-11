@@ -251,21 +251,54 @@ app
     }
   });
 
-app.route("/user/:id/category/:category").get(async (req, res) => {
-  const user = await User.findOne({_id: req.params.id, "categories.urlName":  req.params.category});
-  if (!user)
-    res.json({ log: "Something went wrong: user not found", success: false });
-  else {
-    const category = user.categories.find(
-      (category) => category.urlName === req.params.category
-    );
-    res.json({
-      log: "Successfully fetched all the data of the category",
-      data: category,
-      success: true,
+app
+  .route("/user/:id/category/:category")
+  .get(async (req, res) => {
+    const user = await User.findOne({
+      _id: req.params.id,
+      "categories.urlName": req.params.category,
     });
-  }
-});
+    if (!user)
+      res.json({ log: "Something went wrong: category not found", success: false });
+    else {
+      const category = user.categories.find(
+        (category) => category.urlName === req.params.category
+      );
+      res.json({
+        log: "Successfully fetched all the data of the category",
+        data: category,
+        success: true,
+      });
+    }
+  })
+  .patch(async (req, res) => {
+    const user = await User.findOne({
+      _id: req.params.id,
+      "categories.urlName": req.params.category,
+    });
+    if (!user)
+      res.json({ log: "Something went wrong: user not found", success: false });
+    else {
+      const category = user.categories.find(
+        (category) => category.urlName === req.params.category
+      );
+      const filter = { "categories.urlName": req.params.category };
+      const update = {
+        $set: {
+          "categories.$.name": req.body.name,
+          "categories.$.urlName": _.kebabCase(req.body.name),
+        },
+      };
+      await User.updateOne(filter, update);
+      category.name = req.body.name;
+      category.urlName = _.kebabCase(req.body.name);
+      res.json({
+        log: "Successfully updated the data of the category",
+        data: category,
+        success: true,
+      });
+    }
+  });
 // ! --------------------------} CRUD ON TODO LIST END
 
 app.listen(PORT, () => {
