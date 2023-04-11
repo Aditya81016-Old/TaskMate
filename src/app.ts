@@ -2,11 +2,12 @@
 require("dotenv").config();
 import express, { json, urlencoded } from "express";
 import mongoose, { ConnectOptions } from "mongoose";
-import User, { UserInterface, UserDocument } from "./models/user";
+import User, { UserInterface, UserDocument, Category, Todo } from "./models/user";
 const bcrypt = require("bcrypt");
 
 const app = express();
 const PORT = 3000;
+const URL = `http://localhost:${PORT}`
 const saltRounds = 10;
 
 app.use(json());
@@ -45,6 +46,7 @@ app
           name: req.body.name,
           email: req.body.email,
           password: hashedPassword,
+          categories: req.body.categories
         };
 
         const user = new User(newUser);
@@ -151,7 +153,7 @@ app
   .delete(async (req, res) => {
     const id: string = req.params.id;
     console.log("runs");
-    fetch(`http://localhost:3000/user?id=${id}`, {
+    fetch(`${URL}/user?id=${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -201,6 +203,35 @@ app
       });
   });
 // ! -------------------------------} CRUD ON USER END
+
+// ! CRUD ON TODO LIST {------------------------------
+app.route('/:id')
+.post(async (req, res) => {
+  const id = req.params.id;
+  const categoryName = req.body.categoryName != undefined ? req.body.categoryName : null;
+  const newCategory: Category = {
+    name: categoryName,
+    todos: [
+      {
+        task: `Create a new task in ${categoryName}`,
+        state: 'Pending',
+      }
+    ]
+  }
+  try {
+    const user: UserDocument = await User.findByIdAndUpdate(
+      id,
+      { $addToSet: { categories: newCategory } },
+      { new: true }
+    );
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ message: "Could not add favorite" });
+  }
+  
+
+})
+// ! --------------------------} CRUD ON TODO LIST END
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
