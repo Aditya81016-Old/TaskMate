@@ -32,6 +32,7 @@ mongoose
 // ! --------------------------------} BOILERPLATE END
 
 // * / --route
+// * this route will send the home page
 app.get("/", (req, res) => {
   res.send("LesGo");
 });
@@ -40,6 +41,9 @@ app.get("/", (req, res) => {
 // * /user --route
 app
   .route("/user")
+
+  // * this route will create new user
+  // * this route needs -- name | email | password -- in body
   .post((req, res) => {
     bcrypt.hash(req.body.password, saltRounds, (err, hashedPassword) => {
       if (err) {
@@ -52,7 +56,16 @@ app
           name: req.body.name,
           email: req.body.email,
           password: hashedPassword,
-          categories: req.body.categories,
+          categories: [{
+            name: "Home",
+            urlName: _.kebabCase("Home"),
+            todos: [
+              {
+                task: `Create a new task in "Home"`,
+                state: "Pending",
+              },
+            ],
+          }]
         };
 
         const user = new User(newUser);
@@ -67,30 +80,26 @@ app
           })
           .catch((error) => {
             res.json({
-              log: `email already used`,
+              log: `email already used: ${error}`,
               success: false,
             });
           });
       }
     });
   })
-  .get(async (req, res) => {
-    const id = req.query.id;
-    const email = req.query.email;
-    let user: UserDocument | null = null;
 
-    if (id != undefined && mongoose.isValidObjectId(id)) {
-      user = await User.findOne({ _id: id });
-    } else if (email != undefined) {
-      user = await User.findOne({ email: email });
-    }
+// * this route will repond with an array with all the users in it
+// * this request dosen't require any parameters
+  .get(async (req, res) => {
+    const email = req.query.email;
+    let user = await User.find();
 
     if (!user) {
-      res.json({ log: "User not found", success: false });
+      res.json({ log: "failed to fetch users", success: false });
     } else {
       res.json({
         data: user,
-        log: `User with id: ${user?._id} and email: ${user?.email} found!`,
+        log: `Fetched all the users`,
         success: true,
       });
     }
@@ -99,6 +108,9 @@ app
 // * /user/:id --route
 app
   .route("/user/:id")
+
+  // * this route responds with all the details of a user
+  // * the user depends on the id parameter in req
   .get(async (req, res) => {
     const id = req.params.id;
     let user: UserDocument | null = await User.findOne({ _id: id });
@@ -113,6 +125,10 @@ app
       });
     }
   })
+
+  // * this request updates the detailes of the user
+  // * it requires -- name | email | password -- depending on what to update in -- body
+  // * aswell as -- current password -- for verification through -- query
   .patch(async (req, res) => {
     try {
       const id: string = req.params.id;
@@ -156,10 +172,13 @@ app
       return res.json({ message: "Server Error", success: false });
     }
   })
+
+  // * this request deletes user
+  // * it requires -- name | email | password -- from -- body
+  // * also -- id -- from -- params
   .delete(async (req, res) => {
     const id: string = req.params.id;
-    console.log("runs");
-    fetch(`${URL}/user?id=${id}`, {
+    fetch(`${URL}/user/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -167,12 +186,10 @@ app
     })
       .then((response) => response.json())
       .then(async (data) => {
-        console.log(data);
         bcrypt.compare(
           req.body.password,
           data.data.password,
           async (err, result) => {
-            console.log(err, req.body.password, data.data.password);
             if (err) {
               return res.json({ log: `Something Went Wrong`, success: false });
             } else if (result) {
@@ -194,7 +211,6 @@ app
                   });
                 }
               } catch (err) {
-                console.log(err);
                 return res.json({ log: `There was an error`, success: false });
               }
             } else {
@@ -205,7 +221,7 @@ app
       })
       .catch((error) => {
         // handle error
-        console.log(error);
+        return res.json({ log: `There was an error while deleting your account: ${error}`, success: false });
       });
   });
 // ! -------------------------------} CRUD ON USER END
@@ -213,6 +229,10 @@ app
 // ! CRUD ON TODO LIST {------------------------------
 app
   .route("/user/:id/category")
+
+  // * this request adds new catagory to user
+  // * it requires -- categoryName -- from -- body
+  // * also -- id -- from -- params
   .post(async (req, res) => {
     const id = req.params.id;
     const categoryName =
@@ -238,6 +258,9 @@ app
       res.status(500).json({ message: "Could not add favorite" });
     }
   })
+
+  // * this request responds with all the categories in user 
+  // * it requires -- id -- from -- params
   .get(async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user)
@@ -253,6 +276,9 @@ app
 
 app
   .route("/user/:id/category/:category")
+
+  // * this request responds with all the details of a category of a user
+  // * it requires -- id | category -- from -- params
   .get(async (req, res) => {
     const user = await User.findOne({
       _id: req.params.id,
@@ -271,7 +297,12 @@ app
       });
     }
   })
+
+  // * this request renames specified category of specified user
+  // * it requires -- id | category -- from -- params
+  // * also -- categoryName -- from body
   .patch(async (req, res) => {
+    const categoryName = req.body.categoryName
     const user = await User.findOne({
       _id: req.params.id,
       "categories.urlName": req.params.category,
@@ -285,20 +316,45 @@ app
       const filter = { "categories.urlName": req.params.category };
       const update = {
         $set: {
-          "categories.$.name": req.body.name,
-          "categories.$.urlName": _.kebabCase(req.body.name),
+          "categories.$.name": categoryName,
+          "categories.$.urlName": _.kebabCase(categoryName),
         },
       };
       await User.updateOne(filter, update);
-      category.name = req.body.name;
-      category.urlName = _.kebabCase(req.body.name);
+      category.name = categoryName;
+      category.urlName = _.kebabCase(categoryName);
       res.json({
         log: "Successfully updated the data of the category",
         data: category,
         success: true,
       });
     }
-  });
+  })
+
+  // * deletes the specified category of a specified user
+  // * it requires -- id | category -- from -- params
+  .delete(async (req, res) => {
+    const user = await User.findOne({
+      _id: req.params.id,
+      "categories.urlName": req.params.category,
+    });
+    if (!user)
+      res.json({ log: "Something went wrong: user not found", success: false });
+    else {
+      const category = user.categories.find(
+        (category) => category.urlName === req.params.category
+      );
+      const filter = { "categories.urlName": req.params.category };
+      const update = {
+        $pull:  { categories: { urlName: req.params.category } }
+      };
+      await User.updateOne(filter, update);
+      res.json({
+        log: "Successfully deleted the category",
+        success: true,
+      });
+    }
+  })
 // ! --------------------------} CRUD ON TODO LIST END
 
 app.listen(PORT, () => {

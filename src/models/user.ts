@@ -29,8 +29,8 @@ const todoSchema = new Schema<Todo>({
 })
 
 const categorySchema = new Schema<Category>({
-  name: {type: String, required: true, unique: true},
-  urlName: {type: String, required: true, unique: true},
+  name: {type: String, required: true},
+  urlName: {type: String, required: true},
   todos: {type: [todoSchema], required: true},
 })
 
