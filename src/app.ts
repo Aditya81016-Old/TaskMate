@@ -45,3 +45,5 @@ initialize_category_requests(app)
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
+export { app, bcrypt, saltRounds, URL }

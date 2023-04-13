@@ -1,7 +1,4 @@
-import User, {
-  UserInterface,
-  UserDocument,
-} from "../models/user";
+import User, { UserInterface, UserDocument } from "../models/user";
 const _ = require("lodash");
 
 export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
@@ -16,7 +13,7 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
       bcrypt.hash(req.body.password, saltRounds, (err, hashedPassword) => {
         if (err) {
           res.json({
-            log: `Error encrypting user password: ${err.message}`,
+            log: `Error encrypting user password`,
             success: false,
           });
         } else if (hashedPassword) {
@@ -44,13 +41,14 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
             .save()
             .then((user) => {
               res.json({
-                log: `New user ${user.name} has been added with id ${user._id}`,
+                log: `New user created`,
+                data: user,
                 success: true,
               });
             })
             .catch((error) => {
               res.json({
-                log: `email already used: ${error}`,
+                log: `Email already exists`,
                 success: false,
               });
             });
@@ -90,7 +88,7 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
       } else {
         res.json({
           data: user,
-          log: `User with id: ${user?._id} and email: ${user?.email} found!`,
+          log: `Details of the user sent`,
           success: true,
         });
       }
@@ -110,7 +108,10 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
 
         bcrypt.compare(pass, user.password, async (err, result) => {
           if (err) {
-            return res.json({ log: `Something Went Wrong`, success: false });
+            return res.json({
+              log: `Something Went Wrong: ${err}`,
+              success: false,
+            });
           } else if (result) {
             bcrypt.hash(
               req.body.password,
@@ -124,22 +125,31 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
                 } else if (hashedPassword) {
                   req.body.password = hashedPassword;
                   user.set(req.body);
-                  await user.save();
-                  return res.json({
-                    data: user,
-                    log: `User with id: ${id} found and updated`,
-                    success: true,
-                  });
+                  try {
+                    await user.validate();
+                    await user.save();
+                    return res.json({
+                      data: user,
+                      log: `User updated`,
+                      success: true,
+                    });
+                  } catch (err) {
+                    return res.json({
+                      log: `Email already exists`,
+                      success: false,
+                    });
+                    return;
+                  }   
                 }
               }
             );
           } else {
-            return res.json({ message: "Wrong Password", success: false });
+            return res.json({ log: "Wrong Password", success: false });
           }
         });
       } catch (error) {
         console.error(error);
-        return res.json({ message: "Server Error", success: false });
+        return res.json({ log: "Server Error", success: false });
       }
     })
 
@@ -174,12 +184,12 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
                   });
                   if (result.deletedCount === 1) {
                     return res.json({
-                      log: `User with ID ${id} deleted successfully.`,
+                      log: `Successfully deleted user`,
                       success: true,
                     });
                   } else {
                     return res.json({
-                      log: `Please check your email or username`,
+                      log: `Wrong email or username`,
                       success: false,
                     });
                   }
