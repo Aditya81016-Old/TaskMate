@@ -42,7 +42,6 @@ it("creates new user", async () => {
   })
     .then((res) => res.json())
     .then((data) => {
-
       if (data.data != undefined) {
         user._id = data.data._id;
         user.categories = data.data.categories;
@@ -64,7 +63,6 @@ it("tries to creates a new user with used email", async () => {
   })
     .then((res) => res.json())
     .then((data) => {
-
       if (data.data != undefined) {
         user._id = data.data._id;
         user.categories = data.data.categories;
@@ -160,7 +158,7 @@ it("tries to update the detailes of the user with wrong password", async () => {
 
 it("tries to update the detailes of the user with existing email", async () => {
   const dummy = user.email;
-  user.email = "Used@email.com";
+  user.email = "Used@email.com"; // create a user in your database with this email address
 
   await fetch(URL + `/user/${user._id}?password=${user.password}`, {
     method: "PATCH",
@@ -178,6 +176,92 @@ it("tries to update the detailes of the user with existing email", async () => {
 
   user.email = dummy;
 });
+
+it("creates a new category", async () => {
+  const dummy = user.password;
+  await fetch(URL + `/user/${user._id}/category`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ categoryName: "New Category" }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      user = data.data;
+
+      expect(data.success).toBe(true);
+      expect(data.log).toBe("New category created");
+    })
+    .catch((error) => console.error(error));
+  user.password = dummy;
+});
+
+it("responds with all the categories in user", async () => {
+  await fetch(URL + `/user/${user._id}/category`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      expect(data.success).toBe(true);
+      expect(data.log).toBe("Successfully fetched all the user's categories");
+    })
+    .catch((error) => console.error(error));
+});
+
+it("responds with all the details of a category of a user", async () => {
+  await fetch(
+    URL + `/user/${user._id}/category/${user.categories[1].urlName}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      expect(data.success).toBe(true);
+      expect(data.log).toBe(
+        "Successfully fetched all the data of the category"
+      );
+    });
+});
+
+it("renames a specified category of a specified user", async () => {
+  await fetch(URL + `/user/${user._id}/category/${user.categories[1].urlName}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({categoryName: "Renamed Category"})
+  })
+  .then((res) => res.json())
+  .then((data) => {
+    
+    user.categories = data.data
+
+    expect(data.success).toBe(true);
+    expect(data.log).toBe("Successfully renamed")
+  })
+});
+
+it("deletes the specified category of a specified user", async () => {
+  await fetch(URL + `/user/${user._id}/category/${user.categories[1].urlName}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    expect(data.success).toBe(true)
+    expect(data.log).toBe("Successfully deleted the category")
+  })
+})
 
 it("tries to delete user with wrong name", async () => {
   const dummy = user.name;

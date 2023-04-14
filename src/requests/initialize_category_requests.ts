@@ -29,9 +29,9 @@ export default function initialize_category_requests(app) {
           { $addToSet: { categories: newCategory } },
           { new: true }
         );
-        res.status(200).json({ user });
+        res.json({ data: user, log: "New category created", success: true });
       } catch (error) {
-        res.status(500).json({ message: "Could not add favorite" });
+        res.json({ log: "failed to add category", success: false });
       }
     })
 
@@ -57,7 +57,7 @@ export default function initialize_category_requests(app) {
     .route("/user/:id/category/:category")
 
     // * this request responds with all the details of a category of a user
-    // * it requires -- id | category -- from -- params
+    // * it requires -- id | category's urlName -- from -- params
     .get(async (req, res) => {
       const user = await User.findOne({
         _id: req.params.id,
@@ -109,8 +109,8 @@ export default function initialize_category_requests(app) {
         category.name = categoryName;
         category.urlName = _.kebabCase(categoryName);
         res.json({
-          log: "Successfully updated the data of the category",
-          data: category,
+          log: "Successfully renamed",
+          data: user.categories,
           success: true,
         });
       }
