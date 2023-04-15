@@ -353,9 +353,7 @@ it("deletes a task in todo list of a category", async () => {
     .then((data) => {
       user = data.data
       user.password = dummy;
-
-      console.log(data, user)
-
+      
       expect(data.success).toBe(true);
       expect(data.log).toBe("Task deleted");
     });
