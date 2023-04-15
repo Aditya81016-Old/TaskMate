@@ -232,36 +232,153 @@ it("responds with all the details of a category of a user", async () => {
 });
 
 it("renames a specified category of a specified user", async () => {
-  await fetch(URL + `/user/${user._id}/category/${user.categories[1].urlName}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({categoryName: "Renamed Category"})
-  })
-  .then((res) => res.json())
-  .then((data) => {
-    
-    user.categories = data.data
+  await fetch(
+    URL + `/user/${user._id}/category/${user.categories[1].urlName}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ categoryName: "Renamed Category" }),
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      user.categories = data.data;
 
-    expect(data.success).toBe(true);
-    expect(data.log).toBe("Successfully renamed")
-  })
+      expect(data.success).toBe(true);
+      expect(data.log).toBe("Successfully renamed");
+    });
 });
 
-it("deletes the specified category of a specified user", async () => {
-  await fetch(URL + `/user/${user._id}/category/${user.categories[1].urlName}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json"
+it("creates a new task in todo list of a category", async () => {
+  const dummy = user.password;
+  await fetch(
+    URL + `/user/${user._id}/category/${user.categories[1].urlName}/todo`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        task: "New Task",
+        state: "Pending",
+      }),
     }
-  })
-  .then(res => res.json())
-  .then(data => {
-    expect(data.success).toBe(true)
-    expect(data.log).toBe("Successfully deleted the category")
-  })
-})
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      user = data.data;
+      user.password = dummy;
+
+      expect(data.success).toBe(true);
+      expect(data.log).toBe("Task added");
+    });
+});
+
+it("responds with all the tasks in a category", async () => {
+  await fetch(
+    URL + `/user/${user._id}/category/${user.categories[1].urlName}/todo`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      expect(data.success).toBe(true);
+      expect(data.log).toBe("All tasks fetched");
+    });
+});
+
+it("responds with all the details of a task", async () => {
+  await fetch(
+    URL +
+      `/user/${user._id}/category/${user.categories[1].urlName}/todo/${user.categories[1].todos[1].taskUrl}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      expect(data.success).toBe(true);
+      expect(data.log).toBe("Data of the tasks fetched");
+    });
+});
+
+it("updates data of a task in todo list of a category", async () => {
+  const dummy = user.password;
+  await fetch(
+    URL +
+      `/user/${user._id}/category/${user.categories[1].urlName}/todo/${user.categories[1].todos[1].taskUrl}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        task: "Task Renamed",
+        state: "Ongoing",
+      }),
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      user = data.data
+      user.password = dummy;
+      
+      expect(data.success).toBe(true);
+      expect(data.log).toBe("Data of the tasks updated");
+    });
+});
+
+it("deletes a task in todo list of a category", async () => {
+  const dummy = user.password;
+  await fetch(
+    URL +
+      `/user/${user._id}/category/${user.categories[1].urlName}/todo/${user.categories[1].todos[1].taskUrl}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      user = data.data
+      user.password = dummy;
+
+      console.log(data, user)
+
+      expect(data.success).toBe(true);
+      expect(data.log).toBe("Task deleted");
+    });
+});
+
+// ! DELETE tests starts from here
+
+it("deletes the specified category of a specified user", async () => {
+  await fetch(
+    URL + `/user/${user._id}/category/${user.categories[1].urlName}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      expect(data.success).toBe(true);
+      expect(data.log).toBe("Successfully deleted the category");
+    });
+});
 
 it("tries to delete user with wrong name", async () => {
   const dummy = user.name;

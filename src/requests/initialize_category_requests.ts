@@ -19,6 +19,7 @@ export default function initialize_category_requests(app) {
         todos: [
           {
             task: `Create a new task in ${categoryName}`,
+            taskUrl: _.kebabCase(`Create a new task in ${categoryName}`),
             state: "Pending",
           },
         ],

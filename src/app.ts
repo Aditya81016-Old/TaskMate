@@ -2,8 +2,9 @@
 require("dotenv").config();
 import express, { json, urlencoded } from "express";
 import mongoose, { ConnectOptions } from "mongoose";
-import initialize_user_requests from './requests/initialize_user_requests'
-import initialize_category_requests from './requests/initialize_category_requests'
+import initialize_user_requests from "./requests/initialize_user_requests";
+import initialize_category_requests from "./requests/initialize_category_requests";
+import initialize_todo_requests from "./requests/initialize_todo_requests";
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 
@@ -34,16 +35,19 @@ app.get("/", (req, res) => {
 });
 
 // ! CRUD ON USER START {-------------------------------
-initialize_user_requests(app, bcrypt, saltRounds, URL)
+initialize_user_requests(app, bcrypt, saltRounds, URL);
 // ! -------------------------------} CRUD ON USER END
 
+// ! CRUD ON CATEGORIES START {-------------------------
+initialize_category_requests(app);
+// ! ---------------------------} CRUD ON CATEGORIES END
 
-// ! CRUD ON CATEGORIES {------------------------------
-initialize_category_requests(app)
-// ! --------------------------} CRUD ON TODO LIST END
+// ! CRUD ON TODO START {-------------------------------
+initialize_todo_requests(app);
+// ! ---------------------------------} CRUD ON TODO END
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
 
-export { app, bcrypt, saltRounds, URL }
+export { app, bcrypt, saltRounds, URL };

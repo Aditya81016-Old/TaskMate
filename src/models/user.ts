@@ -2,8 +2,8 @@ import { Schema, model, Document } from "mongoose";
 
 export interface Todo {
   task: string;
+  taskUrl: string;
   state: string;
-  dueDate?: string;
 }
 
 export interface Category {
@@ -24,8 +24,8 @@ export interface UserDocument extends UserInterface, Document {}
 
 const todoSchema = new Schema<Todo>({
   task: {type: String, required: true},
+  taskUrl: {type: String, required: true},
   state: {type: String, required: true},
-  dueDate: {type: String},
 })
 
 const categorySchema = new Schema<Category>({

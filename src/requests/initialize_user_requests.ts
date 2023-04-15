@@ -28,6 +28,7 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
                 todos: [
                   {
                     task: `Create a new task in "Home"`,
+                    taskUrl: _.kebabCase(`Create a new task in "Home"`),
                     state: "Pending",
                   },
                 ],
@@ -139,7 +140,7 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
                       success: false,
                     });
                     return;
-                  }   
+                  }
                 }
               }
             );
