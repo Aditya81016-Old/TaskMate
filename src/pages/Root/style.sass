@@ -1,0 +1,15 @@
+@import "tailwindcss/base"
+@import "tailwindcss/components"
+@import "tailwindcss/utilities"
+    
+$default-transition: all ease-in-out 250ms
+
+.brand .logo, .links div
+    transition: $default-transition
+
+.links div 
+    font-weight: 400
+    @apply text-lg text-white
+
+.links div:hover, .brand .logo:hover
+    transform: scale(1.1)
