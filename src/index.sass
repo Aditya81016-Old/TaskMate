@@ -1,0 +1,33 @@
+@tailwind base
+@tailwind components
+@tailwind utilities
+
+$default-transition: all ease-in-out 250ms
+
+#App 
+    overflow-x: hidden
+
+h1 
+    @apply text-6xl font-extrabold
+
+h2
+    @apply text-5xl font-bold
+
+h3
+    @apply text-4xl font-bold
+ 
+.primary, .secondary, .primary-white, .secondary-white
+    transition: $default-transition
+    @apply px-5 py-3 rounded-lg font-extrabold text-lg hover:scale-110
+
+.primary
+    @apply bg-orange-600 text-white
+
+.secondary
+    @apply bg-amber-400 text-white
+
+.primary-white
+    @apply bg-white text-orange-600
+
+.secondary-white
+    @apply bg-white text-amber-600

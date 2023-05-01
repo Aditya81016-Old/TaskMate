@@ -1,8 +1,12 @@
-@import "tailwindcss/base"
-@import "tailwindcss/components"
-@import "tailwindcss/utilities"
-    
-$default-transition: all ease-in-out 250ms
+@import "../../../index.sass"
+
+#Root, .header
+    overflow: hidden
+
+#Root .header
+    overflow: hidden
+    width: 100vw
+    height: 100vh
 
 .brand .logo, .links div
     transition: $default-transition
