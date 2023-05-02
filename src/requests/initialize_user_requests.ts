@@ -57,21 +57,31 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
       });
     })
 
-    // * this route will repond with an array with all the users in it
-    // * this request dosen't require any parameters
+    // * this route will authenticate a user and repond with all the details of the user
+    // * this request require -- email | password -- from -- query
     .get(async (req, res) => {
       const email = req.query.email;
-      let user = await User.find();
-
-      if (!user) {
-        res.json({ log: "failed to fetch users", success: false });
-      } else {
-        res.json({
-          data: user,
-          log: `Fetched all the users`,
-          success: true,
+      const password = req.query.password;
+      let user = await User.findOne({ email: email });
+      if (user == null) {
+        res.json({ log: "No user found", success: false });
+      } else
+        await bcrypt.compare(password, user.password, (err, result) => {
+          if (err) {
+            res.json({
+              log: `Error encrypting user password`,
+              success: false,
+            });
+          } else if (result) {
+            res.json({
+              data: user,
+              log: `User authenticated`,
+              success: true,
+            });
+          } else if (!result) {
+            res.json({ log: "User not authenticated", success: false });
+          }
         });
-      }
     });
 
   // * /user/:id --route

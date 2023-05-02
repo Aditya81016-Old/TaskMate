@@ -74,8 +74,8 @@ it("tries to creates a new user with used email", async () => {
     .catch((error) => console.error(error));
 });
 
-it("responds with an array with all the users in it", async () => {
-  await fetch(URL + "/user", {
+it("authenticates a user using it email and password", async () => {
+  await fetch(URL + `/user?email=${user.email}&password=${user.password}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -84,7 +84,43 @@ it("responds with an array with all the users in it", async () => {
     .then((res) => res.json())
     .then((data) => {
       expect(data.success).toBe(true);
-      expect(data.log).toBe("Fetched all the users");
+      expect(data.log).toBe("User authenticated");
+    })
+    .catch((error) => console.error(error));
+});
+
+it("tries to authenticates a user using wrong email and password", async () => {
+  await fetch(
+    URL + `/user?email=${user.email + "asdfsf"}&password=${user.password}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      expect(data.success).toBe(false);
+      expect(data.log).toBe("No user found");
+    })
+    .catch((error) => console.error(error));
+});
+
+it("tries to authenticates a user using email and wrong password", async () => {
+  await fetch(
+    URL + `/user?email=${user.email}&password=${user.password + "addad"}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      expect(data.success).toBe(false);
+      expect(data.log).toBe("User not authenticated");
     })
     .catch((error) => console.error(error));
 });
@@ -329,9 +365,9 @@ it("updates data of a task in todo list of a category", async () => {
   )
     .then((res) => res.json())
     .then((data) => {
-      user = data.data
+      user = data.data;
       user.password = dummy;
-      
+
       expect(data.success).toBe(true);
       expect(data.log).toBe("Data of the tasks updated");
     });
@@ -351,9 +387,9 @@ it("deletes a task in todo list of a category", async () => {
   )
     .then((res) => res.json())
     .then((data) => {
-      user = data.data
+      user = data.data;
       user.password = dummy;
-      
+
       expect(data.success).toBe(true);
       expect(data.log).toBe("Task deleted");
     });
