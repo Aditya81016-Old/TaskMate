@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FormEvent } from "react";
 import LoginSVG from "../../assets/LoginSVG";
 import { createUser } from "../../modules/User";
@@ -137,6 +137,7 @@ export default function Register() {
                 Submit
               </button>
             </div>
+            <Link to="/auth?method=login" className=" text-blue-600 underline">Login instead</Link>
           </form>
         </div>
         <LoginSVG scale={0.7} x="0" y="0" />
