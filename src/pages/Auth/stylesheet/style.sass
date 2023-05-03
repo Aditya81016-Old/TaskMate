@@ -24,3 +24,21 @@
 
 .warning
     @apply fixed translate-y-6 text-sm text-red-600
+
+.user-found
+    @apply fixed w-screen h-screen flex justify-center items-center z-10 backdrop-blur-sm
+
+    .box
+        @apply p-5 flex flex-col gap-10 text-center bg-white text-slate-600 rounded-xl
+
+        .header
+            @apply text-3xl
+        
+        .user-email
+            @apply -translate-y-5
+        
+        .button-group
+            @apply flex gap-5
+
+            button
+                @apply text-base

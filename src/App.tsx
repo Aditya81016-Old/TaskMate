@@ -2,6 +2,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Root from "./pages/Root";
 import Auth from "./pages/Auth";
+import Accessed from "./pages/Accessed";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Root />}></Route>
             <Route path="/auth" element={<Auth />}></Route>
+            <Route path="/accessed" element={<Accessed />}></Route>
             {/* Returns a not found page in route id not defiened */}
             <Route path="*" element={<NotFound />}></Route>{" "}
           </Routes>

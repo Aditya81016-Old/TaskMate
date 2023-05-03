@@ -45,7 +45,7 @@ export default function Register() {
       // if server returns a success response then navigate the user to home page
       if (data.success) {
         console.log("User Registered!");
-        navigate("/home");
+        navigate("/accessed");
       }
       // else if the fetch was unsuccessful then info the user
       else {
