@@ -7,12 +7,24 @@ import AddCategory from "./AddCategory";
 import $ from "jquery";
 import { toggleClass } from "../../../modules/Functions";
 
-export default function Categories() {
+type props = {
+  useCategory: [
+    activeCategoryId: string,
+    setActiveCategoryId: React.Dispatch<React.SetStateAction<string>>
+  ];
+
+  setFunctions: [
+    setActiveCategoryId: React.Dispatch<React.SetStateAction<string>>,
+    setActiveCategory: React.Dispatch<React.SetStateAction<CategoryInterface | undefined>>,
+    setTodoList: React.Dispatch<React.SetStateAction<[] | undefined>>
+  ]
+};
+
+export default function Categories(porps: props) {
   // const {categories} = User
+  const { useCategory, setFunctions } = porps;
+  const [, setActiveCategoryId] = useCategory;
   const [categories, setCategories] = useState(User.categories);
-  const [activeCategory, setActiveCategory] = useState(
-    "id" + User.categories[0]?._id
-  );
 
   function getCategoriesSuperset() {
     const res = User.categories;
@@ -23,22 +35,19 @@ export default function Categories() {
     if (String($("#category-name-input").val()).length > 0) {
       await createCategory(String($("#category-name-input").val()));
       setCategories(User.categories);
-      toggleAddCategory()
-      $("#category-name-input").val("")
+      toggleAddCategory();
+      $("#category-name-input").val("");
     }
   }
 
   function setActiveCategorySuperset(id: string) {
-    setActiveCategory(id);
+    setActiveCategoryId(id);
 
     const prevElement = document.querySelectorAll(".category.active");
     prevElement[0]?.classList.remove("active");
 
     const presElement = document.querySelectorAll(`.category#${id}`);
     presElement[0]?.classList.add("active");
-
-    console.log("prev: \n", prevElement[0]?.classList);
-    console.log("pres: \n", presElement[0]?.classList);
   }
 
   function toggleAddCategory() {
@@ -60,6 +69,7 @@ export default function Categories() {
             index={index}
             type="user-defined"
             handleClick={setActiveCategorySuperset}
+            setFunctions={setFunctions}
           />
         ))}
 
@@ -70,8 +80,12 @@ export default function Categories() {
           type="pre-defined"
           index={-1}
           handleClick={toggleAddCategory}
+          setFunctions={setFunctions}
         />
-        <AddCategory toggleFunction={toggleAddCategory} addFunction={createCategorySuperset} />
+        <AddCategory
+          toggleFunction={toggleAddCategory}
+          addFunction={createCategorySuperset}
+        />
       </div>
     </>
   );
