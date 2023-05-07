@@ -1,0 +1,15 @@
+@media screen and (max-width: 500px) 
+    .sm 
+        @apply block
+
+    .nav-link-toggle
+        @apply text-xl 
+
+    .nav-links
+        @apply fixed transition-all flex-col bg-orange-600 w-screen left-0 p-5 text-left -top-52  z-10
+        
+        * 
+            @apply z-10
+
+    .nav-links.active
+        @apply top-10 

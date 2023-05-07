@@ -14,7 +14,6 @@ export default function Accessed() {
   const navigate = useNavigate();
   const { email } = User;
 
-  console.log(email);
   const user = JSON.parse(String(localStorage.getItem("User")));
  
   useEffect(() => {
@@ -22,18 +21,16 @@ export default function Accessed() {
       User.email = user.email;
       User.password = user.password;
       await authenticateUser(User);
-      console.log("User Found!");
       navigate("/accessed");
     }
 
-    if (user == null && email == "") navigate("/auth?method=register");
+    if (user == null && email == "") navigate("/auth?method=login");
     else if (user != null && email == "") {
       authorizeUser()
     }
   });
 
   const page = new URLSearchParams(useLocation().search).get("page") || "home";
-  console.log(page);
 
   return (
     <>

@@ -19,7 +19,7 @@ export async function createUser(User: UserInterface) {
       }
       fetchedData = data;
     })
-    .catch((error) => console.error(error));
+    .catch((error) => console.log(error));
   return fetchedData;
 }
 

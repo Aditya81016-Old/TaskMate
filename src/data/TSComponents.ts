@@ -3,6 +3,12 @@ export interface UserInterface {
     name: string,
     email: string,
     password: string,
-    categories: [],
+    categories: CategoryInterface[],
 }
 
+export interface CategoryInterface {
+    name: string,
+    todos: [],
+    urlName: string,
+    _id: string
+}

@@ -22,7 +22,6 @@ export default function Login() {
     User.password = password;
 
     data = (await authenticateUser(User)) || data;
-    console.log(data, "\n\n", User);
 
     /* 
       if user checked remember me then
@@ -33,12 +32,10 @@ export default function Login() {
 
     // if server returns a success response then navigate the user to home page
     if (data.success) {
-      console.log("User Authenticated!");
       navigate("/accessed");
     }
     // else if the fetch was unsuccessful then info the user
     else {
-      console.log("Failed To Register User! \n", data.log);
 
       // info the user that the email is already used
       if (data.log === "No user found") {

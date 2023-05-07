@@ -29,7 +29,6 @@ export default function Auth() {
     User.email = user.email;
     User.password = user.password;
     await authenticateUser(User);
-    console.log("User Found!");
     navigate("/accessed");
   }
 

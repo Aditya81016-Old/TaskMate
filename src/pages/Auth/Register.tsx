@@ -33,7 +33,6 @@ export default function Register() {
 
       // creates user in backend and updated frontend users property
       data = (await createUser(User)) || data;
-      console.log(data, "\n\n", User);
 
       /* 
       if user checked remember me then
@@ -44,12 +43,10 @@ export default function Register() {
 
       // if server returns a success response then navigate the user to home page
       if (data.success) {
-        console.log("User Registered!");
         navigate("/accessed");
       }
       // else if the fetch was unsuccessful then info the user
       else {
-        console.log("Failed To Register User! \n", data.log);
 
         // info the user that the email is already used
         if (data.log === "Email already exists")
