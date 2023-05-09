@@ -373,6 +373,8 @@ it("updates data of a task in todo list of a category", async () => {
     });
 });
 
+
+// ! DELETE tests starts from here
 it("deletes a task in todo list of a category", async () => {
   const dummy = user.password;
   await fetch(
@@ -394,8 +396,6 @@ it("deletes a task in todo list of a category", async () => {
       expect(data.log).toBe("Task deleted");
     });
 });
-
-// ! DELETE tests starts from here
 
 it("deletes the specified category of a specified user", async () => {
   await fetch(
