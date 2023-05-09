@@ -8,7 +8,14 @@ export interface UserInterface {
 
 export interface CategoryInterface {
     name: string,
-    todos: [],
+    todos: TaskInterface[],
     urlName: string,
+    _id: string
+}
+
+export interface TaskInterface {
+    task: string,
+    taskUrl: string,
+    state: string,
     _id: string
 }

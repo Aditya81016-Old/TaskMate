@@ -1,30 +1,49 @@
-import { CategoryInterface } from "../../../data/TSComponents";
+import { CategoryInterface, TaskInterface } from "../../../data/TSComponents";
 import { User } from "../../../data/Variables";
 import { createCategory } from "../../../modules/Categories";
 import Category from "../../../units/Category";
-import { useEffect, useState } from "react";
-import AddCategory from "./AddCategory";
+import { useEffect } from "react";
+import InputPopup from "./InputPopup";
 import $ from "jquery";
 import { toggleClass } from "../../../modules/Functions";
+import Options from "./Options";
 
 type props = {
-  useCategory: [
+  useCategoryId: [
     activeCategoryId: string,
     setActiveCategoryId: React.Dispatch<React.SetStateAction<string>>
   ];
 
+  useActiveCategory: [
+    activeCategory: CategoryInterface | undefined,
+    setActiveCategory: React.Dispatch<
+      React.SetStateAction<CategoryInterface | undefined>
+    >
+  ];
+
+  useCategories: [
+    categories: CategoryInterface[],
+    setCategories: React.Dispatch<React.SetStateAction<CategoryInterface[]>>
+  ];
+
   setFunctions: [
     setActiveCategoryId: React.Dispatch<React.SetStateAction<string>>,
-    setActiveCategory: React.Dispatch<React.SetStateAction<CategoryInterface | undefined>>,
-    setTodoList: React.Dispatch<React.SetStateAction<[] | undefined>>
-  ]
+    setActiveCategory: React.Dispatch<
+      React.SetStateAction<CategoryInterface | undefined>
+    >,
+    setTodoList: React.Dispatch<
+      React.SetStateAction<TaskInterface[] | undefined>
+    >
+  ];
 };
 
 export default function Categories(porps: props) {
   // const {categories} = User
-  const { useCategory, setFunctions } = porps;
-  const [, setActiveCategoryId] = useCategory;
-  const [categories, setCategories] = useState(User.categories);
+  const { useCategoryId, useActiveCategory, useCategories, setFunctions } =
+    porps;
+  const [, setActiveCategoryId] = useCategoryId;
+  // const [activeCategory, setActiveCategory] = useCategory;
+  const [categories, setCategories] = useCategories;
 
   function getCategoriesSuperset() {
     const res = User.categories;
@@ -32,11 +51,11 @@ export default function Categories(porps: props) {
   }
 
   async function createCategorySuperset() {
-    if (String($("#category-name-input").val()).length > 0) {
-      await createCategory(String($("#category-name-input").val()));
+    if (String($("#Add-Category-input").val()).length > 0) {
+      await createCategory(String($("#Add-Category-input").val()));
       setCategories(User.categories);
       toggleAddCategory();
-      $("#category-name-input").val("");
+      $("#Add-Category-input").val("");
     }
   }
 
@@ -53,6 +72,10 @@ export default function Categories(porps: props) {
   function toggleAddCategory() {
     toggleClass("#Add-Category", "hidden", "flex");
   }
+
+  // function handleOptionClick() {
+
+  // }
 
   useEffect(() => {
     getCategoriesSuperset();
@@ -82,9 +105,19 @@ export default function Categories(porps: props) {
           handleClick={toggleAddCategory}
           setFunctions={setFunctions}
         />
-        <AddCategory
+        <InputPopup
           toggleFunction={toggleAddCategory}
-          addFunction={createCategorySuperset}
+          submitFunction={createCategorySuperset}
+          id="Add-Category"
+          title="Create a new category"
+          placeholder="name of your new category here..."
+        />
+
+        <Options
+          setFunctions={setFunctions}
+          setActiveCategorySuperset={setActiveCategorySuperset}
+          useActiveCategory={useActiveCategory}
+          setCategories={setCategories}
         />
       </div>
     </>

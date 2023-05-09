@@ -4,7 +4,7 @@
 #Categories
     @apply w-screen flex gap-3 px-5 py-3 overflow-x-scroll
 
-#Add-Category
+.InputPopup
     @apply fixed top-0 left-0 z-30 backdrop-blur-sm w-screen h-screen justify-center items-center p-20 text-slate-600
 
     .box
@@ -15,3 +15,9 @@
         
         .button-group
             @apply flex w-full justify-between
+
+.options
+    @apply fixed flex flex-col bg-slate-50 text-slate-600 rounded-md z-30
+
+    button 
+        @apply hover:bg-slate-200 px-3 py-2 text-sm 
