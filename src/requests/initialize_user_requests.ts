@@ -28,7 +28,7 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
                 todos: [
                   {
                     task: `Create a new task in "Home"`,
-                    taskUrl: _.kebabCase(`Create a new task in "Home"`),
+                    taskUrl: _.kebabCase(`Create a new task in Home`),
                     state: "Pending",
                   },
                 ],
@@ -135,22 +135,44 @@ export default function initialize_user_requests(app, bcrypt, saltRounds, URL) {
                   });
                 } else if (hashedPassword) {
                   req.body.password = hashedPassword;
-                  user.set(req.body);
-                  try {
-                    await user.validate();
-                    await user.save();
-                    return res.json({
-                      data: user,
-                      log: `User updated`,
-                      success: true,
+                  User.findOne({ email: req.body.email })
+                    .then((existingUser) => {
+                      if (existingUser && existingUser._id != req.body._id) {
+                        res.json({
+                          log: `Email already exists`,
+                          success: false,
+                        });
+                      } else {
+                        User.findOneAndUpdate(
+                          { _id: req.body._id },
+                          {
+                            name: req.body.name,
+                            email: req.body.email,
+                            password: req.body.password,
+                          },
+                          { new: true }
+                        )
+                          .then((updatedUser) => {
+                            return res.json({
+                              data: updatedUser,
+                              log: `User updated`,
+                              success: true,
+                            });
+                          })
+                          .catch((err) => {
+                            return res.json({
+                              log: `Something went wrong`,
+                              success: false,
+                            });
+                          });
+                      }
+                    })
+                    .catch(() => {
+                      res.json({
+                        log: `Something went wrong`,
+                        success: false,
+                      });
                     });
-                  } catch (err) {
-                    return res.json({
-                      log: `Email already exists`,
-                      success: false,
-                    });
-                    return;
-                  }
                 }
               }
             );
