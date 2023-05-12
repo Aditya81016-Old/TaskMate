@@ -8,8 +8,8 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [emailWarning, setEmailWarning] = useState("")
-  const [passwordWarning, setPasswordWarning] = useState("")
+  const [emailWarning, setEmailWarning] = useState("");
+  const [passwordWarning, setPasswordWarning] = useState("");
 
   const navigate = useNavigate();
 
@@ -28,24 +28,24 @@ export default function Login() {
       frontrnd user will be saved in localstorage
       to access later when user tries to authenticate 
     */
-    if (rememberMe) localStorage.setItem("User", JSON.stringify(User));
-
+    if (rememberMe) {
+      localStorage.setItem("User", JSON.stringify(User));
+    }
     // if server returns a success response then navigate the user to home page
     if (data.success) {
       navigate("/accessed");
     }
     // else if the fetch was unsuccessful then info the user
     else {
-
       // info the user that the email is already used
       if (data.log === "No user found") {
         setEmailWarning("No user with the email found");
-        setPasswordWarning("")
+        setPasswordWarning("");
       }
-      
+
       if (data.log === "User not authenticated") {
         setEmailWarning("");
-        setPasswordWarning("Wrong password")
+        setPasswordWarning("Wrong password");
       }
     }
   }
@@ -100,7 +100,12 @@ export default function Login() {
                 Submit
               </button>
             </div>
-            <Link to="/auth?method=register" className=" text-blue-600 underline">Register instead</Link>
+            <Link
+              to="/auth?method=register"
+              className=" text-blue-600 underline"
+            >
+              Register instead
+            </Link>
           </form>
         </div>
         <LoginSVG scale={0.7} x="0" y="0" />

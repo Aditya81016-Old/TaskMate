@@ -111,6 +111,7 @@ export default function Categories(porps: props) {
           id="Add-Category"
           title="Create a new category"
           placeholder="name of your new category here..."
+          warning=""
         />
 
         <Options

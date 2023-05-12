@@ -34,20 +34,18 @@ export default function Register() {
       // creates user in backend and updated frontend users property
       data = (await createUser(User)) || data;
 
-      /* 
-      if user checked remember me then
-      frontrnd user will be saved in localstorage
-      to access later when user tries to authenticate 
-    */
-      if (rememberMe) localStorage.setItem("User", JSON.stringify(User));
-
       // if server returns a success response then navigate the user to home page
       if (data.success) {
         navigate("/accessed");
+        /* 
+        if user checked remember me then
+        frontrnd user will be saved in localstorage
+        to access later when user tries to authenticate 
+      */
+        if (rememberMe) localStorage.setItem("User", JSON.stringify(User));
       }
       // else if the fetch was unsuccessful then info the user
       else {
-
         // info the user that the email is already used
         if (data.log === "Email already exists")
           setEmailWarning("Email already used");
@@ -134,7 +132,9 @@ export default function Register() {
                 Submit
               </button>
             </div>
-            <Link to="/auth?method=login" className=" text-blue-600 underline">Login instead</Link>
+            <Link to="/auth?method=login" className=" text-blue-600 underline">
+              Login instead
+            </Link>
           </form>
         </div>
         <LoginSVG scale={0.7} x="0" y="0" />

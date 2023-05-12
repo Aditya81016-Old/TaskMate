@@ -25,7 +25,7 @@ h5
 h6
     @apply text-xl font-medium
  
-.primary, .secondary, .primary-white, .secondary-white
+.primary, .secondary, .primary-white, .secondary-white, .danger, .danger-white
     transition: $default-transition
     @apply px-5 py-3 rounded-lg font-extrabold text-lg hover:scale-110
 
@@ -35,11 +35,15 @@ h6
 .secondary
     @apply bg-amber-400 text-white
 
+.danger
+    @apply bg-red-600 text-white
+
 .primary-white
     @apply bg-white text-orange-600
 
 .secondary-white
     @apply bg-white text-amber-600
+
 
 /* width */
 ::-webkit-scrollbar 

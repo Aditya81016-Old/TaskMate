@@ -1,18 +1,20 @@
-import { TaskInterface } from "../data/TSComponents"
+import { TaskInterface } from "../data/TSComponents";
 
 type props = {
-    todo: TaskInterface
-}
+  todo: TaskInterface;
+  id: string;
+};
 
 export default function Todo(props: props) {
+  const { todo, id } = props;
+  const { task } = todo;
 
-    const {todo} = props;
-    const {task, state} = todo
-
-    return (<>
-        <div className="task">
-            <h6>{task}</h6>
-            <div>{state}</div>
-        </div>
-    </>)
+  return (
+    <>
+      <div className="task" id={id}>
+        <input type="checkbox" id={`${id}-checkbox`} />
+        <h6>{task}</h6>
+      </div>
+    </>
+  );
 }

@@ -24,7 +24,10 @@ export default function Home() {
         useCategories={[categories, setCategories]}
         setFunctions={[setActiveCategoryId, setActiveCategory, setTodoList]}
       />
-      <Todos todoList={todoList} />
+      <Todos
+        todoList={todoList}
+        useActiveCategory={[activeCategory, setActiveCategory]}
+      />
     </>
   );
 }

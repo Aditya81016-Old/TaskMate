@@ -89,6 +89,7 @@ export default function Options(props: props) {
         id="Rename-Category"
         title="Rename your category"
         placeholder="new name of your category here..."
+        warning=""
       />
     </>
   );
