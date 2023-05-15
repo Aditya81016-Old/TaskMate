@@ -82,17 +82,15 @@ export default function Category(props: props) {
       id={"id" + id}
       onClick={handleClickSuperset}
     >
-      <div className="name">
-        {name}
-      </div>
-        {type == "user-defined" && (
-          <div
-            className="icon rounded-full relative z-30 opacity-60 hover:opacity-100 px-1"
-            onClick={toogleOption}
-          >
-            <FontAwesomeIcon icon={faEllipsisVertical} />
-          </div>
-        )}
+      <div className="name">{name}</div>
+      {type == "user-defined" && (
+        <div
+          className="icon rounded-full relative z-10 opacity-60 hover:opacity-100 px-1"
+          onClick={toogleOption}
+        >
+          <FontAwesomeIcon icon={faEllipsisVertical} />
+        </div>
+      )}
     </button>
   );
 }

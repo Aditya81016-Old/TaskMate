@@ -2,7 +2,7 @@ import { CategoryInterface, TaskInterface } from "../../../data/TSComponents";
 import { User } from "../../../data/Variables";
 import { createCategory } from "../../../modules/Categories";
 import Category from "../../../units/Category";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import InputPopup from "./InputPopup";
 import $ from "jquery";
 import { toggleClass } from "../../../modules/Functions";
@@ -44,6 +44,7 @@ export default function Categories(porps: props) {
   const [, setActiveCategoryId] = useCategoryId;
   // const [activeCategory, setActiveCategory] = useCategory;
   const [categories, setCategories] = useCategories;
+  const [AddCategoryWarning, setAddCategoryWarning] = useState("");
 
   function getCategoriesSuperset() {
     const res = User.categories;
@@ -52,10 +53,16 @@ export default function Categories(porps: props) {
 
   async function createCategorySuperset() {
     if (String($("#Add-Category-input").val()).length > 0) {
-      await createCategory(String($("#Add-Category-input").val()));
-      setCategories(User.categories);
-      toggleAddCategory();
-      $("#Add-Category-input").val("");
+      const data = await createCategory(String($("#Add-Category-input").val()));
+      if (data.success) {
+        setCategories(User.categories);
+        toggleAddCategory();
+        setAddCategoryWarning("");
+        $("#Add-Category-input").val("");
+      } else {
+        if (data.log == "Category already exists")
+          setAddCategoryWarning("Category already exists");
+      }
     }
   }
 
@@ -111,7 +118,7 @@ export default function Categories(porps: props) {
           id="Add-Category"
           title="Create a new category"
           placeholder="name of your new category here..."
-          warning=""
+          warning={AddCategoryWarning}
         />
 
         <Options

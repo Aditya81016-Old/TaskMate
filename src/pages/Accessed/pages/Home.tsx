@@ -27,6 +27,7 @@ export default function Home() {
       <Todos
         todoList={todoList}
         useActiveCategory={[activeCategory, setActiveCategory]}
+        setTodoList={setTodoList}
       />
     </>
   );

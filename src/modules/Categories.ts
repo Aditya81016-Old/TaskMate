@@ -1,21 +1,30 @@
 import { SetStateAction } from "react";
 import { User } from "../data/Variables";
 import { URL } from "../data/Variables";
-import { CategoryInterface, TaskInterface } from "../data/TSComponents";
+import { TaskInterface } from "../data/TSComponents";
 
 export async function createCategory(categoryName: string) {
-  await fetch(URL + `/user/${User._id}/category`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ categoryName: categoryName }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      User.categories = data.data.categories;
+  let fetchedData = { success: false, log: "" };
+  const category = User.categories.find((cat) => cat.name == categoryName);
+  if (category == undefined) {
+    await fetch(URL + `/user/${User._id}/category`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ categoryName: categoryName }),
     })
-    .catch((error) => console.error(error));
+      .then((res) => res.json())
+      .then((data) => {
+        fetchedData = data;
+        User.categories = data.data.categories;
+      })
+      .catch((error) => console.error(error));
+  } else {
+    fetchedData = { success: false, log: "Category already exists" };
+  }
+
+  return fetchedData;
 }
 
 export async function getCategories(): Promise<SetStateAction<[]>> {
@@ -34,21 +43,30 @@ export async function getCategories(): Promise<SetStateAction<[]>> {
   return [];
 }
 
-export async function renameCategory(categoryUrl: string, categoryName: string) {
-  await fetch(
-    URL + `/user/${User._id}/category/${categoryUrl}`,
-    {
+export async function renameCategory(
+  categoryUrl: string,
+  categoryName: string
+) {
+  let fetchedData = { success: false, log: "" };
+  const category = User.categories.find((cat) => cat.name == categoryName);
+  if (category == undefined) {
+    await fetch(URL + `/user/${User._id}/category/${categoryUrl}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ categoryName: categoryName }),
-    }
-  )
-    .then((res) => res.json())
-    .then((data) => {
-      User.categories = data.data;
-    });
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        fetchedData = data;
+        User.categories = data.data;
+      });
+  } else {
+    fetchedData = { success: false, log: "Category already exists" };
+  }
+
+  return fetchedData;
 }
 
 export async function deleteCategory(

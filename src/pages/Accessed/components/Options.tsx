@@ -4,6 +4,7 @@ import { renameCategory, deleteCategory } from "../../../modules/Categories";
 import InputPopup from "./InputPopup";
 import { toggleClass } from "../../../modules/Functions";
 import { User } from "../../../data/Variables";
+import { useState } from "react";
 
 type props = {
   useActiveCategory: [
@@ -37,17 +38,23 @@ export default function Options(props: props) {
   } = props;
   const [activeCategory] = useActiveCategory;
   const [, , setTodoList] = setFunctions;
+  const [RenameCategoryWarning, setRenameCategoryWarning] = useState("");
 
   async function renameCategorySuperset() {
     if (String($("#Rename-Category-input").val()).length > 0) {
-      await renameCategory(
+      const data = await renameCategory(
         String(activeCategory?.urlName),
         String($("#Rename-Category-input").val())
       );
-      setCategories(User.categories);
-      $("#Rename-Category-input").val("");
-      togglePopup();
-      toggleOption();
+      if (data.success) {
+        setCategories(User.categories);
+        $("#Rename-Category-input").val("");
+        togglePopup();
+        toggleOption();
+      } else {
+        if (data.log == "Category already exists")
+          setRenameCategoryWarning("Category already exists");
+      }
     }
   }
 
@@ -89,7 +96,7 @@ export default function Options(props: props) {
         id="Rename-Category"
         title="Rename your category"
         placeholder="new name of your category here..."
-        warning=""
+        warning={RenameCategoryWarning}
       />
     </>
   );

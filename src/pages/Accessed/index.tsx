@@ -9,13 +9,14 @@ import Settings from "./pages/Settings";
 import About from "./pages/About";
 
 import "./stylesheet/style.sass";
+import "./stylesheet/res.sass";
 
 export default function Accessed() {
   const navigate = useNavigate();
   const { email } = User;
 
   const user = JSON.parse(String(localStorage.getItem("User")));
- 
+
   useEffect(() => {
     async function authorizeUser() {
       User.email = user.email;
@@ -26,7 +27,7 @@ export default function Accessed() {
 
     if (user == null && email == "") navigate("/auth?method=login");
     else if (user != null && email == "") {
-      authorizeUser()
+      authorizeUser();
     }
   });
 

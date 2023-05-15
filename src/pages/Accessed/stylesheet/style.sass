@@ -2,13 +2,13 @@
     @apply w-screen h-screen
 
 #Categories
-    @apply w-screen flex gap-3 px-5 py-3 overflow-x-scroll
+    @apply w-screen flex gap-3 px-5 py-3 overflow-x-scroll 
 
 .InputPopup
     @apply fixed top-0 left-0 z-30 backdrop-blur-sm w-screen h-screen justify-center items-center p-20 text-slate-600
 
     .box
-        @apply bg-slate-50 p-10 flex flex-col justify-between gap-10 items-center text-center
+        @apply bg-slate-50 p-10 flex outline-2 outline rounded-md flex-col justify-between gap-10 items-center text-center
 
         input
             @apply flex flex-col w-full px-5 py-2 rounded-md
@@ -23,10 +23,7 @@
         @apply hover:bg-slate-200 px-3 py-2 text-sm 
 
 #Settings
-    @apply w-screen h-screen text-center flex flex-col justify-center items-center text-slate-600 py-10
-
-    // *
-    //     outline: auto
+    @apply w-screen h-screen text-center flex flex-col justify-center items-center text-slate-600 pt-4
 
     #Infos
         @apply h-full my-10 flex flex-col gap-10

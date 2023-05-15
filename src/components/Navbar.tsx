@@ -50,7 +50,7 @@ export default function Navbar(props: props) {
         <div className="nav-link-toggle sm z-20" onClick={toggleNavLinks}>
           <FontAwesomeIcon icon={faBars} />
         </div>
-        <div className="nav-links z-10">
+        <div className="nav-links">
           <LinkTo
             name="Home"
             link="/accessed?page=home"
@@ -74,7 +74,10 @@ export default function Navbar(props: props) {
           />
         </div>
       </div>
-      <div className="nav-block w-full h-full hidden bg-black opacity-5 fixed left-0 sm z-0" onClick={toggleNavLinks}></div>
+      <div
+        className="nav-block w-full h-full hidden bg-black opacity-5 fixed left-0 sm z-0"
+        onClick={toggleNavLinks}
+      ></div>
     </>
   );
 }

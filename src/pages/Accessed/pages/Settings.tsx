@@ -7,15 +7,15 @@ import $ from "jquery";
 import { useNavigate } from "react-router-dom";
 
 export default function Settings() {
-  const { password } = User;
-
   const navigate = useNavigate();
 
   const dumName = User.name,
-    dumEmail = User.email;
+    dumEmail = User.email,
+    dumPass = User.password;
 
   const [inputName, setInputName] = useState(dumName);
   const [inputEmail, setInputEmail] = useState(dumEmail);
+  const [inputPass, setInputPass] = useState(dumPass);
 
   const [PopupPassInputWarning, setPopupPassInputWarning] = useState("");
   const [PopupPassInputWarning2, setPopupPassInputWarning2] = useState("");
@@ -97,10 +97,12 @@ export default function Settings() {
           <div className="info">
             <div className="title">Password: </div>
             <input
-              type="text"
+              type="password"
               name="name"
               id="password-input"
-              value={password}
+              value={inputPass}
+              readOnly
+              onChange={(e) => setInputPass(e.currentTarget.value)}
             />
           </div>
           <div className="info my-20">
