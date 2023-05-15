@@ -21,19 +21,17 @@ export interface UserInterface {
 
 export interface UserDocument extends UserInterface, Document {}
 
-
 const todoSchema = new Schema<Todo>({
-  task: {type: String, required: true},
-  taskUrl: {type: String, required: true},
-  state: {type: String, required: true},
-})
+  task: { type: String, required: true },
+  taskUrl: { type: String, required: true },
+  state: { type: String, required: true },
+});
 
 const categorySchema = new Schema<Category>({
-  name: {type: String, required: true},
-  urlName: {type: String, required: true},
-  todos: {type: [todoSchema], required: true},
-})
-
+  name: { type: String, required: true },
+  urlName: { type: String, required: true, unique: true },
+  todos: { type: [todoSchema], required: true },
+});
 
 // Define the user schema
 const userSchema = new Schema<UserInterface>({
